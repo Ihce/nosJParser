@@ -1,4 +1,4 @@
-package deserializer
+package nosj_parser
 
 import "fmt"
 

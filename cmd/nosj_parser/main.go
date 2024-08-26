@@ -1,4 +1,4 @@
-package nosj_parser
+package main
 
 import (
 	"fmt"
