@@ -2,7 +2,7 @@ package deserializer
 
 import "fmt"
 
-func deserialize(input string) {
+func Deserialize(input string) {
 	println("Deserialize")
 	fmt.Printf("Last two bytes: %s\n", input[len(input)-2:])
 	if input[0:2] != "(<" || input[len(input)-2:] != ")>" {
