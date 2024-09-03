@@ -11,7 +11,7 @@ func main() {
 }
 
 func run() int {
-	result, err := deserializer.Deserialize("(<x:(<y:1000>)>)")
+	result, err := deserializer.Deserialize("(<abcd:t e s t s>)")
 
 	if err != nil {
 		fmt.Println(err)

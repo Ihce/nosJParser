@@ -41,6 +41,15 @@ import (
 // 	}
 // }
 
+func TestIsValidSimpleString(t *testing.T) {
+	for _, test := range SimpleStringTestCases {
+		result, err := isValidSimpleString(test.Input)
+		if result != test.Expected || (err != nil && err.Error() != test.ErrMsg) {
+			t.Errorf("isValidSimpleString(%q) = (%v, %v), expected (%v, %v)", test.Input, result, err, test.Expected, test.ErrMsg)
+		}
+	}
+}
+
 func TestDeserializeValidData(t *testing.T) {
 	dir := "../../testdata/valid/"
 	// Discover all test cases in the docs/spec-testcases/valid directory
