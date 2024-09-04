@@ -88,6 +88,7 @@ func tokenize(input string) ([]Token, error) {
 			}
 		case ':':
 			if inKey {
+
 				tokens = append(tokens, Token{Type: KEY, Value: currentToken.String()})
 				currentToken.Reset()
 				inKey = false
@@ -137,8 +138,10 @@ func parseTokens(tokens []Token) (*OrderedMap, error) {
 			stack = stack[:len(stack)-1]
 			currentMap = parentMap
 		case KEY:
-			if strings.Contains(token.Value, " ") {
-				return nil, fmt.Errorf("ERROR -- Invalid key -- Spaces Found In Key: %s", strings.Trim(token.Value, " "))
+			if valid, err := isValidKey(token.Value); err != nil {
+				return nil, err
+			} else if !valid {
+				return nil, fmt.Errorf("ERROR -- Invalid Key")
 			}
 			currentKey = token.Value
 		case VALUE:
@@ -216,9 +219,19 @@ func parseValues(token Token) (string, string, error) {
 
 func isBinaryString(input string) (bool, error) {
 	for _, char := range input {
-		if char != '0' && char != '1' {
+		if char != 0x30 && char != 0x31 {
 			return false, nil
 		}
+	}
+	return true, nil
+}
+
+func isValidKey(input string) (bool, error) {
+	for _, char := range []byte(input) {
+		if !(0x61 <= char && char <= 0x7A) {
+			return false, nil
+		}
+
 	}
 	return true, nil
 }

@@ -101,4 +101,5 @@ var EdgeTestCases = []EdgeTestCase{
 	{"(<a:1010>)", "begin-map\na -- num -- -6\nend-map\n", nil},
 	{"(<a:1010,a:1010>)", "begin-map\na -- num -- -6\nend-map\n", nil},
 	{"(<a:s>)", "begin-map\na -- string -- \nend-map\n", nil},
+	{"(<!:s>)", "", "ERROR -- Invalid Key"},
 }
