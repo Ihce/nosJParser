@@ -11,7 +11,7 @@
             "request": "launch",
             "mode": "auto",
             "program": "cmd/nosj_parser/main.go",
-            "args": ["spec-testcases/valid/0001.input"]
+            "args": ["../../spec-testcases/valid/0013.input"]
         }
     ]
 }

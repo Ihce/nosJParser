@@ -14,6 +14,9 @@ VALID_TC = [
         ('spec-testcases/valid/0008.input', 'spec-testcases/valid/0008.output'),
         ('spec-testcases/valid/0009.input', 'spec-testcases/valid/0009.output'),
         ('spec-testcases/valid/0010.input', 'spec-testcases/valid/0010.output'),
+        ('spec-testcases/valid/0011.input', 'spec-testcases/valid/0011.output'),
+        ('spec-testcases/valid/0012.input', 'spec-testcases/valid/0012.output'),
+        ('spec-testcases/valid/0013.input', 'spec-testcases/valid/0013.output'),
         ]
 
 INVALID_TC = [

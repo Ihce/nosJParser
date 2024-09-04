@@ -63,7 +63,7 @@ func tokenize(input string) ([]Token, error) {
 		switch char {
 		case '(':
 			if input[i+1] == '<' && i+1 < len(input) {
-
+				currentToken.Reset()
 				tokens = append(tokens, Token{Type: START_MAP, Value: "(<"})
 				inKey = true
 				i++
@@ -73,8 +73,12 @@ func tokenize(input string) ([]Token, error) {
 		case '>':
 			if input[i+1] == ')' && i+1 < len(input) {
 				if currentToken.Len() > 0 {
-					tokens = append(tokens, Token{Type: VALUE, Value: currentToken.String()})
-					currentToken.Reset()
+					if len(strings.Trim(currentToken.String(), " ")) == 0 {
+						currentToken.Reset()
+					} else {
+						tokens = append(tokens, Token{Type: VALUE, Value: currentToken.String()})
+						currentToken.Reset()
+					}
 				}
 				tokens = append(tokens, Token{Type: END_MAP, Value: ">)"})
 				inKey = false
@@ -127,7 +131,7 @@ func parseTokens(tokens []Token) (*OrderedMap, error) {
 			currentMap = newMap
 		case END_MAP:
 			if len(stack) == 0 {
-				return currentMap, nil // Return the root map when the stack is empty
+				return currentMap, nil
 			}
 			parentMap := stack[len(stack)-1]
 			stack = stack[:len(stack)-1]
@@ -172,7 +176,6 @@ func printMap(dMap *OrderedMap) (string, error) {
 	return result.String(), nil
 }
 
-// This is awful. I'm sorry.
 func parseValues(token Token) (string, string, error) {
 	if valid, err := isValidComplexString(token.Value); err != nil {
 		return "", "", err
@@ -184,7 +187,6 @@ func parseValues(token Token) (string, string, error) {
 		return "string", resultString, nil
 	}
 
-	// Check if the token value is a valid binary string
 	if valid, err := isBinaryString(token.Value); err != nil {
 		return "", "", err
 	} else if valid {
@@ -202,7 +204,6 @@ func parseValues(token Token) (string, string, error) {
 		return "num", strconv.FormatInt(value, 10), nil
 	}
 
-	// Check if the token value is a valid simple string
 	if valid, err := isValidSimpleString(token.Value); err != nil {
 		return "", "", err
 	} else if valid {
@@ -210,7 +211,6 @@ func parseValues(token Token) (string, string, error) {
 		return "string", resultString, nil
 	}
 
-	// If none of the above, return an error
 	return "Unknown", "", fmt.Errorf("ERROR -- Invalid value %s", token.Value)
 }
 
@@ -223,9 +223,6 @@ func isBinaryString(input string) (bool, error) {
 	return true, nil
 }
 
-//	func isValidMap(input string) bool {
-//		return strings.HasPrefix(input, "(<") && strings.HasSuffix(input, ">)")
-//	}
 func isValidSimpleString(input string) (bool, error) {
 	if len(input) == 0 {
 		return false, fmt.Errorf("ERROR -- Invalid Value -- Simple strings can not be empty")
