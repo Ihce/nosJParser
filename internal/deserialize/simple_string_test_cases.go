@@ -1,13 +1,19 @@
 package deserializer
 
-type TestCase struct {
+type SimpleStringTestCase struct {
 	Input    string
 	Expected bool
 	ErrMsg   string
 }
 
+type EdgeTestCase struct {
+	Input    string
+	Expected string
+	ErrMsg   interface{}
+}
+
 // Generated loosely by LLM
-var SimpleStringTestCases = []TestCase{
+var SimpleStringTestCases = []SimpleStringTestCase{
 	// Valid cases
 	{"hellos", true, ""},
 	{"hello worlds", true, ""},
@@ -85,4 +91,14 @@ var SimpleStringTestCases = []TestCase{
 	{"hello\u2067worlds", false, "ERROR -- Invalid Value -- Simple strings has an illegal character(s)"},           // Right-to-left isolate
 	{"hello\u2068worlds", false, "ERROR -- Invalid Value -- Simple strings has an illegal character(s)"},           // First strong isolate
 	{"hello\u2069worlds", false, "ERROR -- Invalid Value -- Simple strings has an illegal character(s)"},           // Pop directional isolate
+}
+
+var EdgeTestCases = []EdgeTestCase{
+	{"", "", "ERROR -- Input is empty"},
+	{"test", "", "ERROR -- Input does not contain a map"},
+	{"(<a:abcds,b:1001,c:efghis,d:1011,e:jklmops>)", "begin-map\na -- string -- abcd\nb -- num -- -7\nc -- string -- efghi\nd -- num -- -5\ne -- string -- jklmop\nend-map\n", nil},
+	{"(<a:s>)", "begin-map\na -- string -- \nend-map\n", nil},
+	{"(<a:1010>)", "begin-map\na -- num -- -6\nend-map\n", nil},
+	{"(<a:1010,a:1010>)", "begin-map\na -- num -- -6\nend-map\n", nil},
+	{"(<a:s>)", "begin-map\na -- string -- \nend-map\n", nil},
 }

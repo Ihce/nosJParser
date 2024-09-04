@@ -50,6 +50,14 @@ func TestIsValidSimpleString(t *testing.T) {
 	}
 }
 
+func TestEdgeCaseDeserialize(t *testing.T) {
+	for _, test := range EdgeTestCases {
+		result, err := Deserialize(test.Input)
+		if result != test.Expected || (err != nil && err.Error() != test.ErrMsg) {
+			t.Errorf("isValidSimpleString(%q) = (%v, %v), expected (%v, %v)", test.Input, result, err, test.Expected, test.ErrMsg)
+		}
+	}
+}
 func TestDeserializeValidData(t *testing.T) {
 	dir := "../../testdata/valid/"
 	// Discover all test cases in the docs/spec-testcases/valid directory

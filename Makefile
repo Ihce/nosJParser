@@ -1,6 +1,3 @@
-# Define the output directory for the binary
-BINDIR := bin
-
 # Define the name of the binary
 BINARY := nosj_parser
 
@@ -9,12 +6,11 @@ SRCDIR := ./cmd/nosj_parser
 
 # Define the build target
 build:
-	@mkdir -p $(BINDIR)
-	go build -o $(BINDIR)/$(BINARY) $(SRCDIR)
+	@go build -o $(BINARY) $(SRCDIR)
 
 # Define the run target
-run: build
-	./$(BINDIR)/$(BINARY)
+run:
+	@./$(BINARY) $(FILE)
 
 # Define the clean target
 clean:
@@ -22,4 +18,3 @@ clean:
 
 # Define the default target
 .PHONY: all
-all: build

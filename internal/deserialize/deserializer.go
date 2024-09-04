@@ -26,6 +26,34 @@ func (t TokenType) String() string {
 	return [...]string{"START_MAP", "END_MAP", "KEY", "VALUE"}[t]
 }
 
+type OrderedMap struct {
+	keys []string
+	data map[string]interface{}
+}
+
+func NewOrderedMap() *OrderedMap {
+	return &OrderedMap{
+		keys: []string{},
+		data: make(map[string]interface{}),
+	}
+}
+
+func (om *OrderedMap) Set(key string, value interface{}) {
+	if _, exists := om.data[key]; !exists {
+		om.keys = append(om.keys, key)
+	}
+	om.data[key] = value
+}
+
+func (om *OrderedMap) Get(key string) (interface{}, bool) {
+	value, exists := om.data[key]
+	return value, exists
+}
+
+func (om *OrderedMap) Keys() []string {
+	return om.keys
+}
+
 func tokenize(input string) ([]Token, error) {
 	var tokens []Token
 	var currentToken strings.Builder
@@ -83,23 +111,21 @@ func tokenize(input string) ([]Token, error) {
 	return tokens, nil
 }
 
-func parseTokens(tokens []Token) (map[string]interface{}, error) {
-	stack := []map[string]interface{}{}
-	var currentMap map[string]interface{}
+func parseTokens(tokens []Token) (*OrderedMap, error) {
+	stack := []*OrderedMap{}
+	var currentMap *OrderedMap
 	var currentKey string
 
 	for _, token := range tokens {
 		switch token.Type {
 		case START_MAP:
-			// Create a new map and push the current map onto the stack if it exists
-			newMap := map[string]interface{}{}
+			newMap := NewOrderedMap()
 			if currentMap != nil {
 				stack = append(stack, currentMap)
-				currentMap[currentKey] = newMap
+				currentMap.Set(currentKey, newMap)
 			}
 			currentMap = newMap
 		case END_MAP:
-			// Pop the map from the stack and set the current map as the value for the current key in the parent map
 			if len(stack) == 0 {
 				return currentMap, nil // Return the root map when the stack is empty
 			}
@@ -107,26 +133,25 @@ func parseTokens(tokens []Token) (map[string]interface{}, error) {
 			stack = stack[:len(stack)-1]
 			currentMap = parentMap
 		case KEY:
-			// Set the current key to the token's value
 			if strings.Contains(token.Value, " ") {
 				return nil, fmt.Errorf("ERROR -- Invalid key -- Spaces Found In Key: %s", strings.Trim(token.Value, " "))
 			}
 			currentKey = token.Value
 		case VALUE:
-			// Set the value for the current key in the current map
-			currentMap[currentKey] = token.Value
+			currentMap.Set(currentKey, token.Value)
 			currentKey = ""
 		}
 	}
 	return currentMap, nil
 }
 
-func printMap(dMap map[string]interface{}) (string, error) {
+func printMap(dMap *OrderedMap) (string, error) {
 	var result strings.Builder
 	result.WriteString("begin-map\n")
-	for key, value := range dMap {
+	for _, key := range dMap.Keys() {
+		value := dMap.data[key]
 		switch v := value.(type) {
-		case map[string]interface{}:
+		case *OrderedMap:
 			result.WriteString(fmt.Sprintf("%s -- map -- \n", key))
 			nestedMapValue, err := printMap(v)
 			if err != nil {
@@ -231,8 +256,11 @@ func isValidComplexString(input string) (bool, error) {
 }
 
 func Deserialize(input string) (string, error) {
-	if len(input) < 4 {
-		return "", fmt.Errorf("ERROR -- Input is too short to contain a root map")
+	if len(input) == 0 {
+		return "", fmt.Errorf("ERROR -- Input is empty")
+	}
+	if !strings.Contains(input, "(<") && !strings.Contains(input, ">)") {
+		return "", fmt.Errorf("ERROR -- Input does not contain a map")
 	}
 	input = strings.Trim(input, " ")
 	tokens, err := tokenize(input)

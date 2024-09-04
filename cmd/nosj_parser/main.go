@@ -11,13 +11,25 @@ func main() {
 }
 
 func run() int {
-	result, err := deserializer.Deserialize("(<abcd:t e s t s>)")
-
-	if err != nil {
-		fmt.Println(err)
+	var args = os.Args
+	if len(args) != 2 {
+		fmt.Fprintln(os.Stderr, "ERROR -- Could not resolve file path")
 		return 66
 	}
 
-	fmt.Println(result)
+	filePath := os.Args[1]
+	fileContent, err := os.ReadFile(filePath)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "ERROR -- Could not read file")
+		return 66
+	}
+	result, err := deserializer.Deserialize(string(fileContent))
+
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return 66
+	}
+
+	fmt.Print(result)
 	return 0
 }

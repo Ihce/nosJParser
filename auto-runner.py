@@ -20,6 +20,8 @@ INVALID_TC = [
         'spec-testcases/invalid/0001.input',
         'spec-testcases/invalid/0002.input',
         'spec-testcases/invalid/0003.input',
+        'spec-testcases/invalid/0004.input',
+        'spec-testcases/invalid/0005.input',
         ]
 
 def check_valid(inputPath, outputPath):
