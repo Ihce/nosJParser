@@ -1,3 +1,6 @@
 testdata/
 nosj_parser
 spec-testcases/
+auto-runner.py
+internal/deserialize/deserializer_test.go
+internal/deserialize/simple_string_test_cases.go
